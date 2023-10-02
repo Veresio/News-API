@@ -12,7 +12,7 @@ afterAll(() => db.end());
 
 describe("General Errors", () => {
   test("should return a 404 for an invalid address", () => {
-    return request(app).get("/topics").expect(404);
+    return request(app).get("/api/bananas").expect(404);
   });
 });
 
