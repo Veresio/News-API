@@ -32,3 +32,17 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
+describe("GET /api/articles/:article_id", () => {
+  xtest("should return a 200 code on succesful call", () => {
+    return request(app).get("/api/articles/4").expect(200);
+  });
+  xtest("should return the correct article based on the id provided", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toBe();
+      });
+  });
+});
