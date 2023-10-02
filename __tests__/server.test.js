@@ -30,6 +30,8 @@ describe("GET /api/topics", () => {
           expect(topic).toHaveProperty("description");
         });
       });
+  });
+});
 describe("GET api", () => {
   test("should return 200", () => {
     return request(app).get("/api").expect(200);
