@@ -18,8 +18,14 @@ exports.fetchTopics = () => {
 
 exports.fetchArticleById = (id) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1 ", [id])
+    .query("SELECT * FROM articles WHERE article_id = $1", [id])
     .then((data) => {
-      return data.rows;
+      if (data.rowCount === 0) {
+        return Promise.reject({
+          status: 400,
+          message: "Article not found",
+        });
+      }
+      return data.rows[0];
     });
 };
