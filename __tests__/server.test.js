@@ -3,6 +3,7 @@ const app = require("../server/app");
 const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
+const apiJSON = require("../endpoints.json");
 
 beforeEach(() => {
   return seed(testData);
@@ -47,6 +48,14 @@ describe("GET api", () => {
           expect(body.endpoints[key]).toHaveProperty("queries");
           expect(body.endpoints[key]).toHaveProperty("exampleResponse");
         }
+      });
+  });
+  test("should return the endpoints.json exactly", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.endpoints).toEqual(apiJSON);
       });
   });
 });
