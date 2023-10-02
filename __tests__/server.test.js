@@ -16,7 +16,6 @@ describe("General Errors", () => {
       .get("/api/bananas")
       .expect(404)
       .then(({ body }) => {
-        console.log(body);
         expect(body.message).toBe("Path not found");
       });
   });
