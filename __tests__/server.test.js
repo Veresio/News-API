@@ -9,6 +9,27 @@ beforeEach(() => {
 });
 afterAll(() => db.end());
 
+describe("General Errors", () => {
+  test("should return a 404 for an invalid address", () => {
+    return request(app).get("/topics").expect(404);
+  });
+});
+
+describe("GET /api/topics", () => {
+  test("should return 200 code", () => {
+    return request(app).get("/api/topics").expect(200);
+  });
+  test('should return a list of topics with a "slug" and "description" value', () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.topics.length).not.toBe(0);
+        body.topics.forEach((topic) => {
+          expect(topic).toHaveProperty("slug");
+          expect(topic).toHaveProperty("description");
+        });
+      });
 describe("GET api", () => {
   test("should return 200", () => {
     return request(app).get("/api").expect(200);
