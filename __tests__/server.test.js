@@ -9,8 +9,21 @@ beforeEach(() => {
 });
 afterAll(() => db.end());
 
-describe("leave me alone husky", () => {
-  test("should let me push", () => {
-    expect(2).toBe(2);
+describe("GET api", () => {
+  test("should return 200", () => {
+    return request(app).get("/api").expect(200);
+  });
+  test("should return an object with a list of all the api calls on this server", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Object.keys(body.endpoints).length).not.toBe(0);
+        for (const key in body.endpoints) {
+          expect(body.endpoints[key]).toHaveProperty("description");
+          expect(body.endpoints[key]).toHaveProperty("queries");
+          expect(body.endpoints[key]).toHaveProperty("exampleResponse");
+        }
+      });
   });
 });
