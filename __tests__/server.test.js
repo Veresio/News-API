@@ -9,8 +9,25 @@ beforeEach(() => {
 });
 afterAll(() => db.end());
 
-describe("leave me alone husky", () => {
-  test("should let me push", () => {
-    expect(2).toBe(2);
+describe("General Errors", () => {
+  test("should return a 404 for an invalid address", () => {
+    return request(app).get("/topics").expect(404);
+  });
+});
+
+describe("GET /api/topics", () => {
+  test("should return 200 code", () => {
+    return request(app).get("/api/topics").expect(200);
+  });
+  test('should return a list of topics with a "slug" and "description" value', () => {
+    return request(app)
+      .get("/api/topics")
+      .expect(200)
+      .then(({ body }) => {
+        body.topics.forEach((topic) => {
+          expect(topic).toHaveProperty("slug");
+          expect(topic).toHaveProperty("description");
+        });
+      });
   });
 });
