@@ -1,3 +1,1 @@
-# Northcoders News API
-
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+This project requires 2 .env files to connect to the 2 databases locally, .env.test and .env.development, they must be set up according to the .env-example file, the name of the databases can be found in setup.sql.
