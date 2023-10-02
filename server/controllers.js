@@ -22,11 +22,3 @@ exports.getArticleById = (req, res, next) => {
     return res.status(200).send({ article });
   });
 };
-
-exports.getArticleById = (req, res, next) => {
-  const id = req.params;
-  console.log(id);
-  fetchArticleById(id).then((article) => {
-    return res.status(200).send({ article });
-  });
-};
