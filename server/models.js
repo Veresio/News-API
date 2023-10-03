@@ -22,7 +22,7 @@ exports.fetchArticleById = (id) => {
     .then((data) => {
       if (data.rowCount === 0) {
         return Promise.reject({
-          status: 400,
+          status: 404,
           message: "Article not found",
         });
       }
