@@ -32,15 +32,17 @@ exports.fetchArticleById = (id) => {
 
 exports.fetchCommentsByArticleId = (id) => {
   return db
-    .query(`SELECT * FROM comments WHERE article_id = $1`, [id])
+    .query(
+      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
+      [id]
+    )
     .then((data) => {
-      console.log(data);
       if (data.rowCount === 0) {
         return Promise.reject({
           status: 404,
           message: "Article not found",
         });
       }
-      return data.rows[0];
+      return data.rows;
     });
 };

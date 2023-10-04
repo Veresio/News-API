@@ -114,30 +114,23 @@ describe("GET /api/articles/:article_id", () => {
 
 describe("GET /api/articles/:article_id/comments", () => {
   test("should return 200 on successful call", () => {
-    request(app).get("/api/articles/1/comments").expect(200);
+    return request(app).get("/api/articles/1/comments").expect(200);
   });
 
   test("should return a list of all the comments attached to that article id", () => {
-    request(app)
+    return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body }) => {
         expect(body.comments.length).toBe(11);
-        expect(body.comments).toHaveProperty("comment_id");
-        expect(body.comments).toHaveProperty("votes");
-        expect(body.comments).toHaveProperty("created_at");
-        expect(body.comments).toHaveProperty("author");
-        expect(body.comments).toHaveProperty("body");
-        expect(body.comments).toHaveProperty("article_id");
-      });
-  });
-
-  xtest('should return a 404 error with the message "Article not found" when provided an incorrect id', () => {
-    return request(app)
-      .get("/api/articles/70650/comments")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Article not found");
+        body.comments.forEach((comment) => {
+          expect(comment).toHaveProperty("comment_id");
+          expect(comment).toHaveProperty("votes");
+          expect(comment).toHaveProperty("created_at");
+          expect(comment).toHaveProperty("author");
+          expect(comment).toHaveProperty("body");
+          expect(comment).toHaveProperty("article_id");
+        });
       });
   });
 
@@ -150,12 +143,29 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 
-  xtest("should return a 404 with custom message if there are no comments attached to the article", () => {
+  test('should return a 404 error with the message "Article not found" when provided an incorrect id', () => {
+    return request(app)
+      .get("/api/articles/70650/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article not found");
+      });
+  });
+
+  xtest("should return a 404 with 'No comments available' if there are no comments attached to the article", () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("No comments available");
+      });
+  });
+  test("should return a sorted list from oldest to newest", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
