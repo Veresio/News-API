@@ -1,2 +1,2 @@
-require("jest-extended");
+require("jest-extended/all");
 require("jest-sorted");
