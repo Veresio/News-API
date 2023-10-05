@@ -66,6 +66,20 @@
       }
     ]
   },
+  "POST /api/articles/article:id/comments": {
+    "description": "adds a comment to any article",
+    "queries": [],
+    "exampleResponse": {
+      "comment": {
+        "comment_id": 19,
+        "body": "test comment",
+        "article_id": 2,
+        "author": "butter_bridge",
+        "votes": 0,
+        "created_at": "2023-10-05T11:04:36.014Z"
+      }
+    }
+  },
   "PATCH /api/articles/article:id": {
     "description": "serves an article with the votes updated according to passed data",
     "queries": [],
