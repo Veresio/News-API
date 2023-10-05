@@ -4,6 +4,7 @@ const {
   fetchArticleById,
   AddCommentsByArticleID,
   fetchArticles,
+  updateArticlesById,
 } = require("./models");
 
 exports.getApi = (req, res, next) => {
@@ -48,6 +49,18 @@ exports.postCommentsByArticleId = (req, res, next) => {
   AddCommentsByArticleID(article_id, body)
     .then((comment) => {
       return res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.patchArticlesById = (req, res, next) => {
+  const { article_id } = req.params;
+  const { body } = req;
+  updateArticlesById(article_id, body)
+    .then((article) => {
+      return res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);
