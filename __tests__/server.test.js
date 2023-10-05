@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const apiJSON = require("../endpoints.json");
-const { expect } = require("@jest/globals");
 
 beforeEach(() => {
   return seed(testData);
@@ -317,6 +316,28 @@ describe("PATCH /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid format");
+      });
+  });
+});
+
+describe("DELETE /api/comments/:comment_id", () => {
+  test("should return a 204 code with no content on successful delete", () => {
+    return request(app).delete("/api/comments/6").expect(204);
+  });
+  test("should return 404 if the comment does not exist ", () => {
+    return request(app)
+      .delete("/api/comments/12576123")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Comment does not exist");
+      });
+  });
+  test("should return 400 if the format of the id is wrong ", () => {
+    return request(app)
+      .delete("/api/comments/six")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid data type");
       });
   });
 });
