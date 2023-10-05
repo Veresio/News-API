@@ -341,3 +341,26 @@ describe("DELETE /api/comments/:comment_id", () => {
       });
   });
 });
+
+describe("GET /api/users", () => {
+  test("should return 200 code", () => {
+    return request(app).get("/api/users").expect(200);
+  });
+  test('should return a list of users with a "username", "avatar_url and "name" value', () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.users.length).not.toBe(0);
+        body.users.forEach((user) => {
+          console.log(user);
+          expect(user).toHaveProperty("username");
+          expect(typeof user.username).toBe("string");
+          expect(user).toHaveProperty("name");
+          expect(typeof user.name).toBe("string");
+          expect(user).toHaveProperty("avatar_url");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});
