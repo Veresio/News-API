@@ -105,6 +105,24 @@ describe("GET /api/articles", () => {
         expect(body.articles).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test("should return only the articles that have the correct topics according to the query", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        body.articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("should return a 404 error if there are no articles for that topic", () => {
+    return request(app)
+      .get("/api/articles?topic=fire")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("No articles available with that topic");
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {
