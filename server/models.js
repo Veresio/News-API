@@ -94,7 +94,6 @@ exports.AddCommentsByArticleID = (id, newComment) => {
           message: "Invalid format",
         });
       } else {
-        console.log(body, username, id);
         return db
           .query(
             `INSERT INTO comments 
@@ -106,6 +105,34 @@ exports.AddCommentsByArticleID = (id, newComment) => {
           )
           .then((comment) => {
             return comment.rows[0];
+          });
+      }
+    });
+};
+
+exports.updateArticlesById = (id, voteCount) => {
+  const { inc_votes } = voteCount;
+  return db
+    .query("SELECT * FROM articles WHERE article_id= $1", [id])
+    .then((data) => {
+      if (data.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Article does not exist",
+        });
+      } else if (!inc_votes) {
+        return Promise.reject({
+          status: 400,
+          message: "Invalid format",
+        });
+      } else {
+        return db
+          .query(
+            `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *`,
+            [inc_votes, id]
+          )
+          .then((article) => {
+            return article.rows[0];
           });
       }
     });

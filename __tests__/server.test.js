@@ -271,3 +271,52 @@ describe("POST /api/articles/:article_id/comments ", () => {
       });
   });
 });
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("should return 201 with the updated article", () => {
+    return request(app)
+      .patch("/api/articles/8")
+      .send({ inc_votes: 3 })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article.votes).toBe(3);
+      });
+  });
+  test("should apply negative values correctly", () => {
+    return request(app)
+      .patch("/api/articles/8")
+      .send({ inc_votes: -5 })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.article.votes).toBe(-5);
+      });
+  });
+
+  test("should return 404 if the article does not exist ", () => {
+    return request(app)
+      .patch("/api/articles/123454")
+      .send({ inc_votes: 3 })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article does not exist");
+      });
+  });
+  test("should return 400 if inc_votes is not a number", () => {
+    return request(app)
+      .patch("/api/articles/8")
+      .send({ inc_votes: "three" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid data type");
+      });
+  });
+  test("should return 400 if inc_votes is not present", () => {
+    return request(app)
+      .patch("/api/articles/8")
+      .send({ votes_up: 5 })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid format");
+      });
+  });
+});
