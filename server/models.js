@@ -39,3 +39,46 @@ exports.fetchArticles = () => {
       return data.rows;
     });
 };
+
+exports.AddCommentsByArticleID = (id, newComment) => {
+  const { body, username } = newComment;
+  return db
+    .query("SELECT * FROM articles WHERE article_id= $1", [id])
+    .then((data) => {
+      if (data.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Article does not exist",
+        });
+      } else {
+        return db.query("SELECT * FROM users WHERE username = $1", [username]);
+      }
+    })
+    .then((data) => {
+      if (data.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Username does not exist",
+        });
+      } else if (!body || !username) {
+        return Promise.reject({
+          status: 400,
+          message: "Invalid format",
+        });
+      } else {
+        console.log(body, username, id);
+        return db
+          .query(
+            `INSERT INTO comments 
+              (body,author,article_id) 
+              VALUES 
+              ($1, $2, $3) 
+              RETURNING *`,
+            [body, username, id]
+          )
+          .then((comment) => {
+            return comment.rows[0];
+          });
+      }
+    });
+};

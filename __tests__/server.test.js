@@ -152,3 +152,57 @@ describe("GET /api/articles", () => {
       });
   });
 });
+
+describe("POST /api/articles/:article_id/comments ", () => {
+  postComment = { username: "butter_bridge", body: "test comment" };
+  test("should return code 201 with the added comment", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(postComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.body).toEqual(postComment.body);
+        expect(body.comment.author).toEqual(postComment.username);
+        expect(body.comment.article_id).toBe(2);
+        expect(body.comment).toHaveProperty("comment_id");
+        expect(body.comment).toHaveProperty("votes");
+        expect(body.comment).toHaveProperty("created_at");
+      });
+  });
+  test('should return a 400 error with "Invalid format" if given the wrong properties', () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "butter_bridge" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid format");
+      });
+  });
+  test("should return 404 error if article does not exits", () => {
+    return request(app)
+      .post("/api/articles/1256/comments")
+      .send(postComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article does not exist");
+      });
+  });
+  test('should return a 400 error with "Invalid data type" if article id is not a number', () => {
+    return request(app)
+      .post("/api/articles/two/comments")
+      .send(postComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid data type");
+      });
+  });
+  test('should return a 404 error with "Username does not exist" if given an invalid username', () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "Veresio", body: "test comment" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Username does not exist");
+      });
+  });
+});
