@@ -67,6 +67,47 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("GET /api/articles", () => {
+  test("should return code 200 on successful call", () => {
+    return request(app).get("/api/articles").expect(200);
+  });
+  test("should return all objects in articles with the correct properties", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).not.toBe(0);
+        body.articles.forEach((article) => {
+          expect(article).toHaveProperty("author");
+          expect(typeof article.author).toBe("string");
+          expect(article).toHaveProperty("title");
+          expect(typeof article.title).toBe("string");
+          expect(article).toHaveProperty("article_id");
+          expect(typeof article.article_id).toBe("number");
+          expect(article).toHaveProperty("topic");
+          expect(typeof article.topic).toBe("string");
+          expect(article).toHaveProperty("created_at");
+          expect(typeof article.created_at).toBe("string");
+          expect(article).toHaveProperty("votes");
+          expect(typeof article.votes).toBe("number");
+          expect(article).toHaveProperty("article_img_url");
+          expect(typeof article.article_img_url).toBe("string");
+          expect(article).toHaveProperty("comment_count");
+          expect(typeof article.comment_count).toBe("string");
+          expect(article).not.toHaveProperty("body");
+        });
+      });
+  });
+  test("should return the articles order by date descending", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("should return a 200 code on succesful call", () => {
     return request(app).get("/api/articles/4").expect(200);
@@ -109,101 +150,6 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid data type");
-      });
-  });
-});
-
-describe("GET /api/articles", () => {
-  test("should return code 200 on successful call", () => {
-    return request(app).get("/api/articles").expect(200);
-  });
-  test("should return all objects in articles with the correct properties", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles.length).not.toBe(0);
-        body.articles.forEach((article) => {
-          expect(article).toHaveProperty("author");
-          expect(typeof article.author).toBe("string");
-          expect(article).toHaveProperty("title");
-          expect(typeof article.title).toBe("string");
-          expect(article).toHaveProperty("article_id");
-          expect(typeof article.article_id).toBe("number");
-          expect(article).toHaveProperty("topic");
-          expect(typeof article.topic).toBe("string");
-          expect(article).toHaveProperty("created_at");
-          expect(typeof article.created_at).toBe("string");
-          expect(article).toHaveProperty("votes");
-          expect(typeof article.votes).toBe("number");
-          expect(article).toHaveProperty("article_img_url");
-          expect(typeof article.article_img_url).toBe("string");
-          expect(article).toHaveProperty("comment_count");
-          expect(typeof article.comment_count).toBe("string");
-          expect(article).not.toHaveProperty("body");
-        });
-      });
-  });
-  test("should return the articles order by date descending", () => {
-    return request(app)
-      .get("/api/articles")
-      .expect(200)
-      .then(({ body }) => {
-        expect(body.articles).toBeSortedBy("created_at", { descending: true });
-      });
-  });
-});
-
-describe("POST /api/articles/:article_id/comments ", () => {
-  postComment = { username: "butter_bridge", body: "test comment" };
-  test("should return code 201 with the added comment", () => {
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send(postComment)
-      .expect(201)
-      .then(({ body }) => {
-        expect(body.comment.body).toEqual(postComment.body);
-        expect(body.comment.author).toEqual(postComment.username);
-        expect(body.comment.article_id).toBe(2);
-        expect(body.comment).toHaveProperty("comment_id");
-        expect(body.comment).toHaveProperty("votes");
-        expect(body.comment).toHaveProperty("created_at");
-      });
-  });
-  test('should return a 400 error with "Invalid format" if given the wrong properties', () => {
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send({ username: "butter_bridge" })
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("Invalid format");
-      });
-  });
-  test("should return 404 error if article does not exits", () => {
-    return request(app)
-      .post("/api/articles/1256/comments")
-      .send(postComment)
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Article does not exist");
-      });
-  });
-  test('should return a 400 error with "Invalid data type" if article id is not a number', () => {
-    return request(app)
-      .post("/api/articles/two/comments")
-      .send(postComment)
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("Invalid data type");
-      });
-  });
-  test('should return a 404 error with "Username does not exist" if given an invalid username', () => {
-    return request(app)
-      .post("/api/articles/2/comments")
-      .send({ username: "Veresio", body: "test comment" })
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Username does not exist");
       });
   });
 });
@@ -268,6 +214,60 @@ describe("GET /api/articles/:article_id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         expect(body.comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
+describe("POST /api/articles/:article_id/comments ", () => {
+  postComment = { username: "butter_bridge", body: "test comment" };
+  test("should return code 201 with the added comment", () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send(postComment)
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment.body).toEqual(postComment.body);
+        expect(body.comment.author).toEqual(postComment.username);
+        expect(body.comment.article_id).toBe(2);
+        expect(body.comment).toHaveProperty("comment_id");
+        expect(body.comment).toHaveProperty("votes");
+        expect(body.comment).toHaveProperty("created_at");
+      });
+  });
+  test('should return a 400 error with "Invalid format" if given the wrong properties', () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "butter_bridge" })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid format");
+      });
+  });
+  test("should return 404 error if article does not exits", () => {
+    return request(app)
+      .post("/api/articles/1256/comments")
+      .send(postComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article does not exist");
+      });
+  });
+  test('should return a 400 error with "Invalid data type" if article id is not a number', () => {
+    return request(app)
+      .post("/api/articles/two/comments")
+      .send(postComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Invalid data type");
+      });
+  });
+  test('should return a 404 error with "Username does not exist" if given an invalid username', () => {
+    return request(app)
+      .post("/api/articles/2/comments")
+      .send({ username: "Veresio", body: "test comment" })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Username does not exist");
       });
   });
 });

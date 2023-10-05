@@ -22,6 +22,16 @@ exports.getTopics = (req, res, next) => {
     });
 };
 
+exports.getArticles = (req, res, next) => {
+  fetchArticles()
+    .then((articles) => {
+      return res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
   fetchArticleById(article_id)
@@ -33,10 +43,11 @@ exports.getArticleById = (req, res, next) => {
     });
 };
 
-exports.getArticles = (req, res, next) => {
-  fetchArticles()
-    .then((articles) => {
-      return res.status(200).send({ articles });
+exports.getCommentsbyArticleId = (req, res, next) => {
+  const { article_id } = req.params;
+  fetchCommentsByArticleId(article_id)
+    .then((comments) => {
+      return res.status(200).send({ comments });
     })
     .catch((err) => {
       next(err);
@@ -49,17 +60,6 @@ exports.postCommentsByArticleId = (req, res, next) => {
   AddCommentsByArticleID(article_id, body)
     .then((comment) => {
       return res.status(201).send({ comment });
-    })
-    .catch((err) => {
-      next(err);
-    });
-};
-
-exports.getCommentsbyArticleId = (req, res, next) => {
-  const { article_id } = req.params;
-  fetchCommentsByArticleId(article_id)
-    .then((comments) => {
-      return res.status(200).send({ comments });
     })
     .catch((err) => {
       next(err);

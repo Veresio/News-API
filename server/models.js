@@ -16,6 +16,16 @@ exports.fetchTopics = () => {
   });
 };
 
+exports.fetchArticles = () => {
+  return db
+    .query(
+      "SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC;"
+    )
+    .then((data) => {
+      return data.rows;
+    });
+};
+
 exports.fetchArticleById = (id) => {
   return db
     .query("SELECT * FROM articles WHERE article_id = $1", [id])
@@ -30,13 +40,31 @@ exports.fetchArticleById = (id) => {
     });
 };
 
-exports.fetchArticles = () => {
+exports.fetchCommentsByArticleId = (id) => {
   return db
-    .query(
-      "SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY articles.created_at DESC;"
-    )
-    .then((data) => {
-      return data.rows;
+    .query(`SELECT * FROM articles WHERE article_id =$1`, [id])
+    .then((article) => {
+      if (article.rowCount === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "Article not found",
+        });
+      } else {
+        return db
+          .query(
+            `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
+            [id]
+          )
+          .then((data) => {
+            if (data.rowCount === 0) {
+              return Promise.reject({
+                status: 404,
+                message: "No comments available",
+              });
+            }
+            return data.rows;
+          });
+      }
     });
 };
 
@@ -78,34 +106,6 @@ exports.AddCommentsByArticleID = (id, newComment) => {
           )
           .then((comment) => {
             return comment.rows[0];
-          });
-      }
-    });
-};
-
-exports.fetchCommentsByArticleId = (id) => {
-  return db
-    .query(`SELECT * FROM articles WHERE article_id =$1`, [id])
-    .then((article) => {
-      if (article.rowCount === 0) {
-        return Promise.reject({
-          status: 404,
-          message: "Article not found",
-        });
-      } else {
-        return db
-          .query(
-            `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
-            [id]
-          )
-          .then((data) => {
-            if (data.rowCount === 0) {
-              return Promise.reject({
-                status: 404,
-                message: "No comments available",
-              });
-            }
-            return data.rows;
           });
       }
     });
