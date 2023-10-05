@@ -351,9 +351,8 @@ describe("GET /api/users", () => {
       .get("/api/users")
       .expect(200)
       .then(({ body }) => {
-        expect(body.users.length).not.toBe(0);
+        expect(body.users.length).toBeGreaterThan(0);
         body.users.forEach((user) => {
-          console.log(user);
           expect(user).toHaveProperty("username");
           expect(typeof user.username).toBe("string");
           expect(user).toHaveProperty("name");
