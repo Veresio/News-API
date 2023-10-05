@@ -3,7 +3,7 @@ const {
   fetchApi,
   fetchArticleById,
   fetchCommentsByArticleId,
-  AddCommentsByArticleID,
+  addCommentsByArticleID,
   fetchArticles,
   updateArticlesById,
 } = require("./models");
@@ -58,7 +58,7 @@ exports.getCommentsbyArticleId = (req, res, next) => {
 exports.postCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { body } = req;
-  AddCommentsByArticleID(article_id, body)
+  addCommentsByArticleID(article_id, body)
     .then((comment) => {
       return res.status(201).send({ comment });
     })

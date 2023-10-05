@@ -68,7 +68,7 @@ exports.fetchCommentsByArticleId = (id) => {
     });
 };
 
-exports.AddCommentsByArticleID = (id, newComment) => {
+exports.addCommentsByArticleID = (id, newComment) => {
   const { body, username } = newComment;
   return db
     .query("SELECT * FROM articles WHERE article_id= $1", [id])
