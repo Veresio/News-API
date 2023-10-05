@@ -1,5 +1,10 @@
 const express = require("express");
-const { getTopics, getApi, getArticleById } = require("./controllers");
+const {
+  getTopics,
+  getApi,
+  getArticleById,
+  getArticles,
+} = require("./controllers");
 const {
   failsafe,
   wrongPath,
@@ -13,6 +18,8 @@ app.get("/api", getApi);
 app.get("/api/topics", getTopics);
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api/articles", getArticles);
 
 app.use(psqlErrors);
 
