@@ -4,6 +4,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const testData = require("../db/data/test-data");
 const apiJSON = require("../endpoints.json");
+const { expect } = require("@jest/globals");
 
 beforeEach(() => {
   return seed(testData);
@@ -125,11 +126,17 @@ describe("GET /api/articles/:article_id/comments", () => {
         expect(body.comments.length).toBe(11);
         body.comments.forEach((comment) => {
           expect(comment).toHaveProperty("comment_id");
+          expect(typeof comment.comment_id).toBe("number");
           expect(comment).toHaveProperty("votes");
+          expect(typeof comment.votes).toBe("number");
           expect(comment).toHaveProperty("created_at");
+          expect(typeof comment.created_at).toBe("string");
           expect(comment).toHaveProperty("author");
+          expect(typeof comment.author).toBe("string");
           expect(comment).toHaveProperty("body");
+          expect(typeof comment.body).toBe("string");
           expect(comment).toHaveProperty("article_id");
+          expect(typeof comment.article_id).toBe("number");
         });
       });
   });
@@ -152,7 +159,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       });
   });
 
-  xtest("should return a 404 with 'No comments available' if there are no comments attached to the article", () => {
+  test("should return a 404 with 'No comments available' if there are no comments attached to the article", () => {
     return request(app)
       .get("/api/articles/2/comments")
       .expect(404)
