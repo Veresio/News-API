@@ -17,26 +17,39 @@ exports.fetchTopics = () => {
 };
 
 exports.fetchArticles = (topic) => {
-  let query =
-    "SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id ";
+  return db
+    .query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+    .then((data) => {
+      if (topic && data.rows.length === 0) {
+        return Promise.reject({
+          status: 400,
+          message: "Topic does not exist",
+        });
+      }
+    })
+    .then(() => {
+      let query =
+        "SELECT articles.author, title, articles.article_id, topic, articles.created_at, articles.votes, article_img_url, COUNT(comments.article_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id ";
 
-  const queryParams = [];
-  if (topic) {
-    queryParams.push(topic);
-    query += `WHERE topic = $1 `;
-  }
-  query += "GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
+      const queryParams = [];
+      if (topic) {
+        queryParams.push(topic);
+        query += `WHERE topic = $1 `;
+      }
+      query +=
+        "GROUP BY articles.article_id ORDER BY articles.created_at DESC;";
 
-  return db.query(query, queryParams).then((data) => {
-    if (data.rows.length === 0) {
-      return Promise.reject({
-        status: 404,
-        message: "No articles available with that topic",
+      return db.query(query, queryParams).then((data) => {
+        if (data.rows.length === 0) {
+          return Promise.reject({
+            status: 404,
+            message: "No articles available with that topic",
+          });
+        } else {
+          return data.rows;
+        }
       });
-    } else {
-      return data.rows;
-    }
-  });
+    });
 };
 
 exports.fetchArticleById = (id) => {
@@ -169,3 +182,5 @@ exports.fetchUsers = () => {
     return data.rows;
   });
 };
+
+function topicCheck(topic) {}

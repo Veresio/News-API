@@ -110,17 +110,27 @@ describe("GET /api/articles", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body }) => {
+        expect(body.articles.length).toBeGreaterThan(0);
         body.articles.forEach((article) => {
           expect(article.topic).toBe("mitch");
         });
       });
   });
-  test("should return a 404 error if there are no articles for that topic", () => {
+  test("should return a 404 error if we're being passed a valid topic with no articles", () => {
     return request(app)
-      .get("/api/articles?topic=fire")
+      .get("/api/articles?topic=paper")
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("No articles available with that topic");
+      });
+  });
+
+  test("should return an error with code 400 if the topic does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=12345")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Topic does not exist");
       });
   });
 });
