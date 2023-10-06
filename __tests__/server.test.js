@@ -116,6 +116,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/4")
       .expect(200)
       .then(({ body }) => {
+        console.log(body.article);
         expect(body.article).toHaveProperty("article_id", 4);
         expect(body.article).toHaveProperty(
           "article_img_url",
@@ -149,6 +150,14 @@ describe("GET /api/articles/:article_id", () => {
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Invalid data type");
+      });
+  });
+  test("should also contain a comment_count value", () => {
+    return request(app)
+      .get("/api/articles/5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toHaveProperty("comment_count", "2");
       });
   });
 });
